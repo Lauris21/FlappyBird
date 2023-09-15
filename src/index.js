@@ -10,7 +10,6 @@ const config = {
     default: "arcade",
     arcade: {
       debug: true, // ayuda ver movimientos y a donde va el objeto
-      gravity: { y: 400 },
     },
   },
   //La escena es lo que puede ver en la pantalla
@@ -22,32 +21,48 @@ const config = {
   },
 };
 
+const velocity = 200;
+
+let bird = null;
+// Asignamos velocidad de vuelo
+const flapVelocity = 250;
+const initialBirdPosition = { x: config.width * 0.1, y: config.height / 2 };
+
+//Asignamos una tuberia
+let upperPipe = null;
+let lowerPipe = null;
+
+// Creamos rango de distancia
+const pipeVerticalDistanceRange = [150, 250];
+// Tamaño de distancia --> método que devuelve valor random entre dos números
+let pipeVerticalDistance = Phaser.Math.Between(...pipeVerticalDistanceRange);
+
+// Asignamos tiempos Delta
+let totalDelta = null;
+
 //cargando archivos
 function preload() {
   //Este contexto es nuestro escenario
   this.load.image("sky", "assets/sky.png");
   this.load.image("bird", "assets/bird.png");
+  this.load.image("pipe", "assets/pipe.png");
 }
-
-const velocity = 200;
-// Asignamos velocidad de vuelo
-const flapVelocity = 250;
-const initialBirdPosition = { x: config.width * 0.1, y: config.height / 2 };
-let bird = null;
-// Asignamos tiempos Delta
-let totalDelta = null;
 
 function create() {
   // 1er valor eje x
   // 2er valor eje y
   // 3er valor clave imagen
   this.add.image(0, 0, "sky").setOrigin(0, 0);
-  // Sprite contiene propiedades con las que jugar
-  // Proporcionamos las coordenadas donde se posicionará el objeto
-  // 3er valor clave del objeto en este caso bird
   bird = this.physics.add
     .sprite(initialBirdPosition.x, initialBirdPosition.y, "bird")
     .setOrigin(0);
+  bird.body.gravity.y = 400;
+
+  upperPipe = this.physics.add.sprite(400, 100, "pipe").setOrigin(0, 1);
+  lowerPipe = this.physics.add
+    .sprite(400, upperPipe.y + pipeVerticalDistance, "pipe")
+    .setOrigin(0, 0);
+
   // Proporcionamos el nombre del evento a capturar
   this.input.on("pointerdown", flap);
   this.input.keyboard.on("spacedown_SPACE", flap);
