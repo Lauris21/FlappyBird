@@ -81,6 +81,8 @@ function update(time, delta) {
   if (bird.y > config.height - bird.height || bird.y < 0) {
     restartBirdPosition();
   }
+  // reciclamos las tuberías
+  recyclePipes();
 }
 
 function placePipe(upPipe, loPipe) {
@@ -104,6 +106,19 @@ function placePipe(upPipe, loPipe) {
 
   loPipe.x = upPipe.x;
   loPipe.y = upPipe.y + pipeVerticalDistance;
+}
+
+function recyclePipes() {
+  const temPipes = [];
+  pipes.getChildren().forEach((pipe) => {
+    //comparamos los límites de la tubería por la derecha y si es afirmativo se recicla
+    if (pipe.getBounds().right <= 0) {
+      temPipes.push(pipe);
+      if (temPipes.length === 2) {
+        placePipe(...temPipes);
+      }
+    }
+  });
 }
 
 function getRightMostPipe() {
