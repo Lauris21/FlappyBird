@@ -3,7 +3,7 @@ import PlayScene from "./scenes/PlayScene";
 
 const width = 800;
 const height = 600;
-const birdPosition = { w: width * 0.1, y: height / 2 };
+const birdPosition = { x: width * 0.1, y: height / 2 };
 
 const sharedConfig = {
   width: width,
