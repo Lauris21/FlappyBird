@@ -22,6 +22,7 @@ const config = {
 };
 
 const velocity = 200;
+const pipesToRender = 4;
 
 let bird = null;
 // Asignamos velocidad de vuelo
@@ -32,10 +33,11 @@ const initialBirdPosition = { x: config.width * 0.1, y: config.height / 2 };
 let upperPipe = null;
 let lowerPipe = null;
 
+// Distancia horizontal de las tuberías
+let pipeHorizontalDistance = 0;
+
 // Creamos rango de distancia
 const pipeVerticalDistanceRange = [150, 250];
-// Tamaño de distancia --> método que devuelve valor random entre dos números
-let pipeVerticalDistance = Phaser.Math.Between(...pipeVerticalDistanceRange);
 
 // Asignamos tiempos Delta
 let totalDelta = null;
@@ -58,10 +60,27 @@ function create() {
     .setOrigin(0);
   bird.body.gravity.y = 400;
 
-  upperPipe = this.physics.add.sprite(400, 100, "pipe").setOrigin(0, 1);
-  lowerPipe = this.physics.add
-    .sprite(400, upperPipe.y + pipeVerticalDistance, "pipe")
-    .setOrigin(0, 0);
+  for (let i = 0; i < pipesToRender; i++) {
+    pipeHorizontalDistance += 400;
+
+    // Tamaño de distancia y posicion --> método que devuelve valor random entre dos números
+    let pipeVerticalDistance = Phaser.Math.Between(
+      ...pipeVerticalDistanceRange
+    );
+    let pipeVerticalPosition = Phaser.Math.Between(
+      0 + 20,
+      config.height - 20 - pipeVerticalDistance
+    );
+    upperPipe = this.physics.add
+      .sprite(pipeHorizontalDistance, pipeVerticalPosition, "pipe")
+      .setOrigin(0, 1);
+    lowerPipe = this.physics.add
+      .sprite(upperPipe.x, upperPipe.y + pipeVerticalDistance, "pipe")
+      .setOrigin(0, 0);
+
+    upperPipe.body.velocity.x = -200;
+    lowerPipe.body.velocity.x = -200;
+  }
 
   // Proporcionamos el nombre del evento a capturar
   this.input.on("pointerdown", flap);
