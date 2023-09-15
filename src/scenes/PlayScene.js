@@ -13,7 +13,10 @@ class PlayScene extends Phaser.Scene {
     this.pipeHorizontalDistanceRange = [500, 550];
     //Distancia entre tuberías
     this.pipeHorizontalDistance = 0;
-    this.flapVelocity = 250;
+    this.flapVelocity = 300;
+
+    this.score = 0;
+    this.scoreText = "";
   }
 
   //Este contexto es nuestro escenario
@@ -28,6 +31,7 @@ class PlayScene extends Phaser.Scene {
     this.createBird();
     this.createPipes();
     this.createColliders();
+    this.createScore();
     this.handleInputs();
   }
 
@@ -48,7 +52,7 @@ class PlayScene extends Phaser.Scene {
     this.bird = this.physics.add
       .sprite(this.config.startPosition.x, this.config.startPosition.y, "bird")
       .setOrigin(0);
-    this.bird.body.gravity.y = 400;
+    this.bird.body.gravity.y = 600;
     // choque con la cima y el final de las columnas
     this.bird.setCollideWorldBounds(true);
   }
@@ -77,6 +81,16 @@ class PlayScene extends Phaser.Scene {
     this.physics.add.collider(this.bird, this.pipes, this.gameOver, null, this);
   }
 
+  createScore() {
+    this.score = 0;
+    // scoreText será lo que se renderice, podemos añadir diferentes propiedades
+    // 1er posición X, 2 posición Y, 3 texto, 4 propiedades texto
+    this.scoreText = this.add.text(16, 16`Score: ${score}`, {
+      fontSize: "32px",
+      fill: "#000",
+    });
+  }
+
   //Manejamos eventos
   handleInputs() {
     // Proporcionamos el nombre del evento a capturar
@@ -85,7 +99,7 @@ class PlayScene extends Phaser.Scene {
   }
 
   checkGameStatus() {
-    //si la posicion y del pájaro es menor a 0 o mayor que la altura del lienzo pierdes
+    //si la posicion abajo del pájaro es mayor que la altura del lienzo pierdes o menor que 0
     if (
       this.bird.getBounds().bottom >= this.config.height ||
       this.bird.y <= 0
@@ -125,6 +139,7 @@ class PlayScene extends Phaser.Scene {
         temPipes.push(pipe);
         if (temPipes.length === 2) {
           this.placePipe(...temPipes);
+          this.increaseScore();
         }
       }
     });
@@ -147,10 +162,27 @@ class PlayScene extends Phaser.Scene {
     // this.bird.body.velocity.y = 0;
     this.physics.pause();
     this.bird.setTint(0xee4824);
+
+    // retrasamos la función añadiendo un delay en el contexto
+    this.time.addEvent({
+      delay: 1000,
+      callback: () => {
+        // accdemeos a la escena y reiniciamos, esto se ejecutará después de un segundo
+        // al reinicair la función de creación se ejecuta
+        this.scene.restart();
+      },
+      // no queremos llamarlo todo despues de un segundo
+      loop: false,
+    });
   }
 
   flap() {
     this.bird.body.velocity.y = -this.flapVelocity;
+  }
+
+  increaseScore() {
+    this.score++;
+    this.scoreText.setText(`Score: ${score}`);
   }
 }
 export default PlayScene;
