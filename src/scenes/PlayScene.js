@@ -32,6 +32,7 @@ class PlayScene extends Phaser.Scene {
   }
 
   update() {
+    // Cheuqeamos si choca arriba o abajo de la escena
     this.checkGameStatus();
     // reciclamos las tuberías
     this.recyclePipes();
@@ -48,14 +49,22 @@ class PlayScene extends Phaser.Scene {
       .sprite(this.config.startPosition.x, this.config.startPosition.y, "bird")
       .setOrigin(0);
     this.bird.body.gravity.y = 400;
+    // choque con la cima y el final de las columnas
+    this.bird.setCollideWorldBounds(true);
   }
 
   createPipes() {
     // Almacenamos las tuberías y las añadimos
     this.pipes = this.physics.add.group();
     for (let i = 0; i < pipesToRender; i++) {
-      const upperPipe = this.pipes.create(0, 0, "pipe").setOrigin(0, 1);
-      const lowerPipe = this.pipes.create(0, 0, "pipe").setOrigin(0, 0);
+      const upperPipe = this.pipes
+        .create(0, 0, "pipe")
+        .setImmovable(true)
+        .setOrigin(0, 1);
+      const lowerPipe = this.pipes
+        .create(0, 0, "pipe")
+        .setImmovable(true)
+        .setOrigin(0, 0);
       this.placePipe(upperPipe, lowerPipe);
     }
     this.pipes.setVelocityX(-200);
@@ -78,8 +87,8 @@ class PlayScene extends Phaser.Scene {
   checkGameStatus() {
     //si la posicion y del pájaro es menor a 0 o mayor que la altura del lienzo pierdes
     if (
-      this.bird.y > this.config.height - this.bird.height ||
-      this.bird.y < 0
+      this.bird.getBounds().bottom >= this.config.height ||
+      this.bird.y <= 0
     ) {
       this.gameOver();
     }
@@ -130,11 +139,14 @@ class PlayScene extends Phaser.Scene {
     return rightMostX;
   }
 
+  //Pausamos la gravedad y cambiamos de color el pájaro
   gameOver() {
     // Aquí debemos llegar a la posición inicial
-    this.bird.x = this.config.startPosition.x;
-    this.bird.y = this.config.startPosition.y;
-    this.bird.body.velocity.y = 0;
+    // this.bird.x = this.config.startPosition.x;
+    // this.bird.y = this.config.startPosition.y;
+    // this.bird.body.velocity.y = 0;
+    this.physics.pause();
+    this.bird.setTint(0xee4824);
   }
 
   flap() {
