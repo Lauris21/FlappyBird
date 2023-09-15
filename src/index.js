@@ -23,21 +23,16 @@ const config = {
 
 const velocity = 200;
 const pipesToRender = 4;
+let pipes = null;
 
 let bird = null;
 // Asignamos velocidad de vuelo
 const flapVelocity = 250;
 const initialBirdPosition = { x: config.width * 0.1, y: config.height / 2 };
 
-//Asignamos una tuberia
-let upperPipe = null;
-let lowerPipe = null;
-
-// Distancia horizontal de las tuberías
-let pipeHorizontalDistance = 0;
-
 // Creamos rango de distancia
 const pipeVerticalDistanceRange = [150, 250];
+const pipeHorizontalDistanceRange = [500, 550];
 
 // Asignamos tiempos Delta
 let totalDelta = null;
@@ -60,27 +55,16 @@ function create() {
     .setOrigin(0);
   bird.body.gravity.y = 400;
 
+  pipes = this.physics.add.gruop();
+
   for (let i = 0; i < pipesToRender; i++) {
-    pipeHorizontalDistance += 400;
+    const upperPipe = pipes.create(0, 0, "pipe").setOrigin(0, 1);
+    const lowerPipe = pipes.create(0, 0, "pipe").setOrigin(0, 0);
 
-    // Tamaño de distancia y posicion --> método que devuelve valor random entre dos números
-    let pipeVerticalDistance = Phaser.Math.Between(
-      ...pipeVerticalDistanceRange
-    );
-    let pipeVerticalPosition = Phaser.Math.Between(
-      0 + 20,
-      config.height - 20 - pipeVerticalDistance
-    );
-    upperPipe = this.physics.add
-      .sprite(pipeHorizontalDistance, pipeVerticalPosition, "pipe")
-      .setOrigin(0, 1);
-    lowerPipe = this.physics.add
-      .sprite(upperPipe.x, upperPipe.y + pipeVerticalDistance, "pipe")
-      .setOrigin(0, 0);
-
-    upperPipe.body.velocity.x = -200;
-    lowerPipe.body.velocity.x = -200;
+    placePipe(upperPipe, lowerPipe);
   }
+
+  pipes.setVelocityX(-200);
 
   // Proporcionamos el nombre del evento a capturar
   this.input.on("pointerdown", flap);
@@ -95,11 +79,43 @@ function create() {
 //si la posicion y del pájaro es menor a 0 o mayor que la altura del lienzo pierdes
 function update(time, delta) {
   if (bird.y > config.height - bird.height || bird.y < 0) {
-    restartPlayerPosition();
+    restartBirdPosition();
   }
 }
 
-function restartPlayerPosition() {
+function placePipe(upPipe, loPipe) {
+  // Cogemos la tubería más a la derecha
+  const rightMostX = getRightMostPipe();
+  // Tamaño de distancia y posicion --> método que devuelve valor random entre dos números
+  const pipeVerticalDistance = Phaser.Math.Between(
+    ...pipeVerticalDistanceRange
+  );
+  const pipeVerticalPosition = Phaser.Math.Between(
+    0 + 20,
+    config.height - 20 - pipeVerticalDistance
+  );
+  const pipeHorizontalDistance = Phaser.Math.Between(
+    ...pipeHorizontalDistanceRange
+  );
+
+  // la posicion es la última de la derecha + la distancia horizontal random
+  upPipe.x = rightMostX + pipeHorizontalDistance;
+  upPipe.y = pipeVerticalPosition;
+
+  loPipe.x = upPipe.x;
+  loPipe.y = upPipe.y + pipeVerticalDistance;
+}
+
+function getRightMostPipe() {
+  let rightMostX = 0;
+  // Recorremos las tuberías
+  pipes.getChildren().forEach((pipe) => {
+    rightMostX = Math.max(pipe.x, rightMostX);
+  });
+  return rightMostX;
+}
+
+function restartBirdPosition() {
   // Aquí debemos llegar a la posición inicial
   bird.x = initialBirdPosition.x;
   bird.y = initialBirdPosition.y;
