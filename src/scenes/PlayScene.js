@@ -83,10 +83,16 @@ class PlayScene extends Phaser.Scene {
 
   createScore() {
     this.score = 0;
+    const bestScore = localStorage.getItem("bestScore");
     // scoreText será lo que se renderice, podemos añadir diferentes propiedades
     // 1er posición X, 2 posición Y, 3 texto, 4 propiedades texto
-    this.scoreText = this.add.text(16, 16`Score: ${score}`, {
+    this.scoreText = this.add.text(16, 16, `Score: ${this.score}`, {
       fontSize: "32px",
+      fill: "#000",
+    });
+    // creamos la mejor puntuación
+    this.add.text(16, 52, `Score: ${bestScore || 0}`, {
+      fontSize: "18px",
       fill: "#000",
     });
   }
@@ -140,6 +146,7 @@ class PlayScene extends Phaser.Scene {
         if (temPipes.length === 2) {
           this.placePipe(...temPipes);
           this.increaseScore();
+          this.setBestScore();
         }
       }
     });
@@ -154,16 +161,27 @@ class PlayScene extends Phaser.Scene {
     return rightMostX;
   }
 
+  // Almacenamos la mejor puntuación
+  setBestScore() {
+    const bestScoreText = localStorage.getItem("bestScore");
+    // Lo transformamos a sistema decimal
+    const bestScore = bestScoreText && parseInt(bestScoreText, 10);
+
+    // Comprobamos si no tenemos mejor puntuación o
+    // si esta puntuación es mayor que la mejor puntuación para guardarla en el localStorage
+    if (!bestScore || this.score > bestScore) {
+      localStorage.setItem("bestScore", this.score);
+    }
+  }
+
   //Pausamos la gravedad y cambiamos de color el pájaro
   gameOver() {
-    // Aquí debemos llegar a la posición inicial
-    // this.bird.x = this.config.startPosition.x;
-    // this.bird.y = this.config.startPosition.y;
-    // this.bird.body.velocity.y = 0;
     this.physics.pause();
     this.bird.setTint(0xee4824);
-
     // retrasamos la función añadiendo un delay en el contexto
+
+    this.setBestScore();
+
     this.time.addEvent({
       delay: 1000,
       callback: () => {
@@ -182,7 +200,7 @@ class PlayScene extends Phaser.Scene {
 
   increaseScore() {
     this.score++;
-    this.scoreText.setText(`Score: ${score}`);
+    this.scoreText.setText(`Score: ${this.score}`);
   }
 }
 export default PlayScene;
