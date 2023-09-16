@@ -24,6 +24,7 @@ class PlayScene extends Phaser.Scene {
     this.load.image("sky", "assets/sky.png");
     this.load.image("bird", "assets/bird.png");
     this.load.image("pipe", "assets/pipe.png");
+    this.load.image("pause", "assets/pause.png");
   }
 
   create() {
@@ -32,6 +33,7 @@ class PlayScene extends Phaser.Scene {
     this.createPipes();
     this.createColliders();
     this.createScore();
+    this.createPause();
     this.handleInputs();
   }
 
@@ -97,9 +99,25 @@ class PlayScene extends Phaser.Scene {
     });
   }
 
+  createPause() {
+    const pauseButton = this.add
+      .image(this.congig.width - 10, this.config.height - 10, "pause")
+      .setScale(3)
+      .setOrigin(1);
+
+    // Hacemos el botón interactivo
+    pauseButton.setInteractive();
+
+    // Configuramos el evento al pulsar raton pausamos el juego
+    pauseButton.on("pointerdown", () => {
+      this.physics.pause();
+      this.scene.pause();
+    });
+  }
+
   //Manejamos eventos
   handleInputs() {
-    // Proporcionamos el nombre del evento a capturar
+    // Proporcionamos el nombre del evento a capturar --> espacio o boton derecho
     this.input.on("pointerdown", this.flap, this);
     this.input.keyboard.on("spacedown_SPACE", this.flap, this);
   }
