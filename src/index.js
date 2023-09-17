@@ -2,6 +2,7 @@ import Phaser from "phaser";
 import PlayScene from "./scenes/PlayScene";
 import MenuScene from "./scenes/MenuScene";
 import PreloadScene from "./scenes/PreloadScene";
+import ScoreScene from "./scenes/ScoreScene";
 
 const width = 800;
 const height = 600;
@@ -13,7 +14,7 @@ const sharedConfig = {
   startPosition: birdPosition,
 };
 
-const Scenes = [PreloadScene, MenuScene, PlayScene];
+const Scenes = [PreloadScene, MenuScene, PlayScene, ScoreScene];
 
 // Creamos una nueva escena con la configuracion compartida
 const createScene = (Scene) => new Scene(sharedConfig);
