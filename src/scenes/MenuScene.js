@@ -25,12 +25,23 @@ class MenuScene extends BaseScene {
     const textGO = menuItem.textGO;
     textGO.setInteractive();
 
+    //Cuando ratón pasa
     textGO.on("pointerover", () => {
       textGO.setStyle({ fill: "#ff0" });
     });
 
+    //Cuando ratón sale
     textGO.on("pointerout", () => {
       textGO.setStyle({ fill: "#fff" });
+    });
+
+    // Cuando clicamos
+    textGO.on("pointerup", () => {
+      menuItem.scene && this.scene.start(menuItem.scene);
+
+      if (menuItem.text === "Exit") {
+        this.game.destroy(true);
+      }
     });
   }
 }
