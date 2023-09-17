@@ -1,5 +1,7 @@
 import Phaser from "phaser";
 import PlayScene from "./scenes/PlayScene";
+import MenuScene from "./scenes/MenuScene";
+import PreloadScene from "./scenes/PreloadScene";
 
 const width = 800;
 const height = 600;
@@ -10,6 +12,14 @@ const sharedConfig = {
   height: height,
   startPosition: birdPosition,
 };
+
+const Scenes = [PreloadScene, MenuScene, PlayScene];
+
+// Creamos una nueva escena con la configuracion compartida
+const createScene = (Scene) => new Scene(sharedConfig);
+//Inicializamos instancias para las escenas
+const initScenes = () => Scenes.map(createScene);
+
 const config = {
   //WebGL (web graphics library) API JS para renderizar gráficos en 2 y 3D
   type: Phaser.AUTO,
@@ -23,7 +33,7 @@ const config = {
   },
   //La escena es lo que puede ver en la pantalla
   //Tiene 3 funciones precargar, crear y actualizar
-  scene: [new PlayScene(sharedConfig)],
+  scene: initScenes(),
 };
 
 new Phaser.Game(config);

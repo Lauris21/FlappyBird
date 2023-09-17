@@ -1,11 +1,12 @@
 import Phaser from "phaser";
+import BaseScene from "./BaseScene";
 
 const pipesToRender = 4;
 
-class PlayScene extends Phaser.Scene {
+class PlayScene extends BaseScene {
   constructor(config) {
-    super("PlayScene");
-    this.config = config;
+    // Le pasamos a la BaseScena : la escena y la configuración
+    super("PlayScene", config);
     this.bird = null;
     this.pipes = null;
     // Creamos rango de distancia
@@ -19,16 +20,8 @@ class PlayScene extends Phaser.Scene {
     this.scoreText = "";
   }
 
-  //Este contexto es nuestro escenario
-  preload() {
-    this.load.image("sky", "assets/sky.png");
-    this.load.image("bird", "assets/bird.png");
-    this.load.image("pipe", "assets/pipe.png");
-    this.load.image("pause", "assets/pause.png");
-  }
-
   create() {
-    this.createBG();
+    super.create();
     this.createBird();
     this.createPipes();
     this.createColliders();
@@ -42,12 +35,6 @@ class PlayScene extends Phaser.Scene {
     this.checkGameStatus();
     // reciclamos las tuberías
     this.recyclePipes();
-  }
-
-  // Creamos fondo, pájaro y tuberías
-  createBG() {
-    // 1er valor eje x, 2er valor eje y, 3er valor clave imagen
-    this.add.image(0, 0, "sky").setOrigin(0, 0);
   }
 
   createBird() {
@@ -101,7 +88,7 @@ class PlayScene extends Phaser.Scene {
 
   createPause() {
     const pauseButton = this.add
-      .image(this.congig.width - 10, this.config.height - 10, "pause")
+      .image(this.config.width - 10, this.config.height - 10, "pause")
       .setScale(3)
       .setOrigin(1);
 
