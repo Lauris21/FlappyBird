@@ -9,6 +9,7 @@ class PlayScene extends BaseScene {
     super("PlayScene", config);
     this.bird = null;
     this.pipes = null;
+    this.isPause = false;
     // Creamos rango de distancia
     this.pipeVerticalDistanceRange = [150, 250];
     this.pipeHorizontalDistanceRange = [500, 550];
@@ -28,6 +29,7 @@ class PlayScene extends BaseScene {
     this.createScore();
     this.createPause();
     this.handleInputs();
+    this.listenToEvents();
   }
 
   update() {
@@ -87,6 +89,7 @@ class PlayScene extends BaseScene {
   }
 
   createPause() {
+    this.isPause = false;
     const pauseButton = this.add
       .image(this.config.width - 10, this.config.height - 10, "pause")
       .setScale(3)
@@ -97,6 +100,7 @@ class PlayScene extends BaseScene {
 
     // Configuramos el evento al pulsar raton pausamos el juego
     pauseButton.on("pointerdown", () => {
+      this.isPause = false;
       this.physics.pause();
       this.scene.pause();
       //Lanza una escena pero no cierra la actual --> las mantiene en paralelo
@@ -109,6 +113,53 @@ class PlayScene extends BaseScene {
     // Proporcionamos el nombre del evento a capturar --> espacio o boton derecho
     this.input.on("pointerdown", this.flap, this);
     this.input.keyboard.on("spacedown_SPACE", this.flap, this);
+  }
+
+  listenToEvents() {
+    // Si ya lo tenemos creado salimos y no la iniciamos
+    if (this.pauseEvent) {
+      return;
+    }
+    //Accedemos al evento resume que ejecuta esta escena desde PausaScene
+    // 1 nombre evento, 2 callback
+    this.pauseEvent = this.events.on("resume", () => {
+      // Introducimos cuenta regresiva para el comienzo
+      this.initialTime = 3;
+
+      // Añadimos el texto
+      this.countDownText = this.add
+        .text(
+          ...this.screenCenter,
+          `Fly in: ${this.initialTime}`,
+          this.fontOptions
+        )
+        .setOrigin(0.5);
+
+      this.timeEvent = this.time.addEvent({
+        delay: 1000,
+        callback: () => {
+          this.countDown();
+        },
+        // Alcance de devolución de llamada será este contexto
+        callbackScope: this,
+        //Haremos un bucle tres veces y despues de cada segundo se volverá a llamar
+        loop: true,
+      });
+    });
+  }
+
+  // Creamos cuenta regresiva
+  countDown() {
+    this.initialTime--;
+    this.countDownText.setText(`Fly in: ${this.initialTime}`);
+    if (this.initialTime <= 0) {
+      this.isPause = false;
+      // Vaciamos el texto, reanudamos la física
+      this.countDownText.setText("");
+      this.physics.resume();
+      // Dejamos de escuchar el evento cronometrado para terminar el bucle
+      this.timeEvent.remove();
+    }
   }
 
   checkGameStatus() {
@@ -202,6 +253,11 @@ class PlayScene extends BaseScene {
   }
 
   flap() {
+    // Comprobaremos si estamos en un estado de pausa para no añadir velocidad
+    // Evitamos que al continuar el juego de un saltito hacia arriba
+    if (this.isPause) {
+      return;
+    }
     this.bird.body.velocity.y = -this.flapVelocity;
   }
 
