@@ -19,9 +19,27 @@ class PlayScene extends BaseScene {
 
     this.score = 0;
     this.scoreText = "";
+
+    // Dificultades
+    this.currentDifficulty = "easy";
+    this.difficulties = {
+      easy: {
+        pipeHorizontalDistanceRange: [300, 350],
+        pipeVerticalDistanceRange: [150, 200],
+      },
+      normal: {
+        pipeHorizontalDistanceRange: [280, 330],
+        pipeVerticalDistanceRange: [140, 190],
+      },
+      hard: {
+        pipeHorizontalDistanceRange: [250, 310],
+        pipeVerticalDistanceRange: [120, 150],
+      },
+    };
   }
 
   create() {
+    this.currentDifficulty = "easy";
     super.create();
     this.createBird();
     this.createPipes();
@@ -173,18 +191,20 @@ class PlayScene extends BaseScene {
   }
 
   placePipe(upPipe, loPipe) {
+    // LLamaremos a la dificultad con la actual y cambiamos los valores
+    const difficulty = this.difficulties[this.currentDifficulty];
     // Cogemos la tubería más a la derecha
     const rightMostX = this.getRightMostPipe();
     // Tamaño de distancia y posicion --> método que devuelve valor random entre dos números
     const pipeVerticalDistance = Phaser.Math.Between(
-      ...this.pipeVerticalDistanceRange
+      ...difficulty.pipeVerticalDistanceRange
     );
     const pipeVerticalPosition = Phaser.Math.Between(
       0 + 20,
       this.config.height - 20 - pipeVerticalDistance
     );
     const pipeHorizontalDistance = Phaser.Math.Between(
-      ...this.pipeHorizontalDistanceRange
+      ...difficulty.pipeHorizontalDistanceRange
     );
 
     // la posicion es la última de la derecha + la distancia horizontal random
