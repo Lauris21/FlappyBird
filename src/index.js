@@ -3,6 +3,7 @@ import PlayScene from "./scenes/PlayScene";
 import MenuScene from "./scenes/MenuScene";
 import PreloadScene from "./scenes/PreloadScene";
 import ScoreScene from "./scenes/ScoreScene";
+import PauseScene from "./scenes/PauseScene";
 
 const width = 800;
 const height = 600;
@@ -14,7 +15,8 @@ const sharedConfig = {
   startPosition: birdPosition,
 };
 
-const Scenes = [PreloadScene, MenuScene, PlayScene, ScoreScene];
+//Tienen que ir en orden de ejecución
+const Scenes = [PreloadScene, MenuScene, ScoreScene, PlayScene, PauseScene];
 
 // Creamos una nueva escena con la configuracion compartida
 const createScene = (Scene) => new Scene(sharedConfig);

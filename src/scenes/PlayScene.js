@@ -99,6 +99,8 @@ class PlayScene extends BaseScene {
     pauseButton.on("pointerdown", () => {
       this.physics.pause();
       this.scene.pause();
+      //Lanza una escena pero no cierra la actual --> las mantiene en paralelo
+      this.scene.launch("PauseScene");
     });
   }
 
