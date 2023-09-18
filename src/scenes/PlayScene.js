@@ -48,6 +48,19 @@ class PlayScene extends BaseScene {
     this.createPause();
     this.handleInputs();
     this.listenToEvents();
+
+    this.anims.create({
+      key: "fly",
+      // generamos números
+      frames: this.anims.generateFrameNumbers("bird", { start: 9, end: 15 }),
+      //24 fotogramas por segundo --> hará que cada imagen se repita 3 veces en un segundo
+      frameRate: 8,
+      //Cuantas veces se repetirá la animación -1 = infinito
+      repeat: -1,
+    });
+
+    // Ejecutamos la animación
+    this.bird.play("fly");
   }
 
   update() {
@@ -60,7 +73,12 @@ class PlayScene extends BaseScene {
   createBird() {
     this.bird = this.physics.add
       .sprite(this.config.startPosition.x, this.config.startPosition.y, "bird")
+      .setFlipX(true)
+      .setScale(3)
       .setOrigin(0);
+
+    // Ajustamos el choque al tamaño del pájaro
+    this.bird.setBodySize(this.bird.width, this.bird.height - 8); // Tamaño del pájaro --> 1 ancho 2 alto
     this.bird.body.gravity.y = 600;
     // choque con la cima y el final de las columnas
     this.bird.setCollideWorldBounds(true);
@@ -225,9 +243,20 @@ class PlayScene extends BaseScene {
           this.placePipe(...temPipes);
           this.increaseScore();
           this.setBestScore();
+          this.increaseDifficulty();
         }
       }
     });
+  }
+
+  increaseDifficulty() {
+    if (this.score === 1) {
+      this.currentDifficulty = "normal";
+    }
+
+    if (this.score === 3) {
+      this.currentDifficulty = "hard";
+    }
   }
 
   getRightMostPipe() {

@@ -27,11 +27,19 @@ const config = {
   //WebGL (web graphics library) API JS para renderizar gráficos en 2 y 3D
   type: Phaser.AUTO,
   ...sharedConfig,
+  scale: {
+    parent: "game-container",
+    mode: Phaser.Scale.FIT, // Escala para ajustar al contenedor
+    width: width,
+    height: height,
+  },
+  // Evita que se vean manchas alrededor de elementos
+  pixelArt: true,
   physics: {
     //utiliza la física de arcade -> gestiona simulaciones físicas (gravedad, velocidad, etc)
     default: "arcade",
     arcade: {
-      debug: true, // ayuda ver movimientos y a donde va el objeto
+      // debug: true,  ayuda ver movimientos y a donde va el objeto
     },
   },
   //La escena es lo que puede ver en la pantalla
